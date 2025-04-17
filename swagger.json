@@ -173,22 +173,6 @@
         "description": "유효한 Refresh Token을 이용해 Access Token을 재발급합니다.",
         "operationId": "refresh",
         "responses": {
-          "401": {
-            "description": "Access Token 재발급 실패",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 401,
-                  "code": "401 UNAUTHORIZED",
-                  "message": "Access Token 재발급 실패 - Access Token 재발급 중 오류가 발생했습니다.",
-                  "data": null
-                }
-              }
-            }
-          },
           "200": {
             "description": "Access Token 재발급 성공",
             "content": {
@@ -203,6 +187,22 @@
                   "data": {
                     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Token 재발급 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 UNAUTHORIZED",
+                  "message": "Access Token 재발급 실패 - Access Token 재발급 중 오류가 발생했습니다.",
+                  "data": null
                 }
               }
             }
@@ -224,22 +224,6 @@
         "description": "현재 로그인된 회원을 로그아웃합니다.",
         "operationId": "logout",
         "responses": {
-          "200": {
-            "description": "로그아웃 성공",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 200,
-                  "code": "200 OK",
-                  "message": "로그아웃 성공",
-                  "data": null
-                }
-              }
-            }
-          },
           "401": {
             "description": "로그아웃 실패",
             "content": {
@@ -251,6 +235,22 @@
                   "status": 401,
                   "code": "401 BAD_REQUEST",
                   "message": "로그아웃 실패 - 유효하지 않거나 만료된 Refresh Token",
+                  "data": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "로그아웃 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "로그아웃 성공",
                   "data": null
                 }
               }
@@ -382,7 +382,7 @@
                 "example": {
                   "status": 200,
                   "code": "200 OK",
-                  "message": "로그인 성공",
+                  "message": "이메일 중복 체크 성공",
                   "data": true
                 }
               }
