@@ -12,24 +12,257 @@
   ],
   "tags": [
     {
+      "name": "DietLog API",
+      "description": "식단 기록 관련 API"
+    },
+    {
+      "name": "Recipe API",
+      "description": "레시피 관련 API"
+    },
+    {
       "name": "Member API",
       "description": "회원 관련 API"
     },
     {
       "name": "Auth API",
       "description": "회원 인증 관련 API"
+    },
+    {
+      "name": "Ingredient API",
+      "description": "식재료 관련 API"
+    },
+    {
+      "name": "Recipe Event API",
+      "description": "레시피 이벤트 관련 API"
     }
   ],
   "paths": {
-    "/api/recipe": {
-      "post": {
+    "/api/recipe/{recipeId}/comment/{commentId}": {
+      "put": {
         "tags": [
-          "recipe-controller"
+          "Recipe Event API"
         ],
-        "operationId": "createRecipe",
+        "summary": "레시피 댓글 수정",
+        "description": "레시피에 등록된 댓글을 수정합니다.",
+        "operationId": "editComment",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipeCommentUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "500": {
+            "description": "댓글 수정 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "댓글 수정 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Recipe Event API"
+        ],
+        "summary": "레시피 댓글 삭제",
+        "description": "레시피에 등록된 댓글을 삭제합니다.",
+        "operationId": "deleteComment",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "댓글 삭제 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "댓글 삭제 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/recipe": {
+      "get": {
+        "tags": [
+          "Recipe API"
+        ],
+        "summary": "레시피 목록(홈) 조회",
+        "description": "레시피의 목록(홈) 정보를 조회합니다.",
+        "operationId": "getRecipes",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "categoryType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "한식",
+                "양식",
+                "중식",
+                "일식",
+                "디저트",
+                "음료_차",
+                "양념_소스_잼"
+              ]
+            }
+          },
+          {
+            "name": "categorySlowAging",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "항산화강화",
+                "혈당조절",
+                "염증감소"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "레시피 없음",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "레시피 목록(홈) 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "레시피 목록(홈) 조회 성공",
+                  "data": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Recipe API"
+        ],
+        "summary": "레시피 등록",
+        "description": "레시피를 새로 등록합니다.",
+        "operationId": "createRecipe",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
               "schema": {
                 "required": [
                   "dto"
@@ -56,24 +289,235 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "500": {
+            "description": "레시피 등록 실패",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecipeResponseDTO"
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "레시피 등록 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 201,
+                  "code": "201 OK",
+                  "message": "레시피 등록 성공",
+                  "data": true
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/recipe/{recipeId}/scrap": {
+      "post": {
+        "tags": [
+          "Recipe Event API"
+        ],
+        "summary": "레시피 스크랩하기",
+        "description": "레시피를 스크랩합니다.",
+        "operationId": "scrapRecipe",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "스크랩 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "스크랩 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Recipe Event API"
+        ],
+        "summary": "레시피 스크랩 취소하기",
+        "description": "레시피 스크랩을 취소합니다.",
+        "operationId": "cancelScrapRecipe",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "스크랩 취소 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "스크랩 취소 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/recipe/{recipeId}/like": {
+      "post": {
+        "tags": [
+          "Recipe Event API"
+        ],
+        "summary": "레시피 좋아요하기",
+        "description": "레시피에 좋아요를 누릅니다.",
+        "operationId": "likeRecipe",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "좋아요 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "좋아요 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Recipe Event API"
+        ],
+        "summary": "레시피 좋아요 취소하기",
+        "description": "레시피에 누른 좋아요를 취소합니다.",
+        "operationId": "cancelLikeRecipe",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "좋아요 취소 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "좋아요 취소 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/recipe/{recipeId}/comment": {
       "post": {
         "tags": [
-          "recipe-controller"
+          "Recipe Event API"
         ],
+        "summary": "레시피 댓글 등록",
+        "description": "레시피에 댓글을 등록합니다.",
         "operationId": "addComment",
         "parameters": [
           {
@@ -90,24 +534,39 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RecipeCommentDTO"
+                "$ref": "#/components/schemas/RecipeCommentCreateRequestDTO"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "500": {
+            "description": "댓글 등록 실패",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecipeCommentDTO"
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "댓글 등록 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/member/signup": {
@@ -120,19 +579,30 @@
         "operationId": "signUp",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/SignUpRequestDTO"
+                "required": [
+                  "dto"
+                ],
+                "type": "object",
+                "properties": {
+                  "dto": {
+                    "$ref": "#/components/schemas/SignUpRequestDTO"
+                  },
+                  "profileImage": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
             "description": "회원가입 성공",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommonResponse"
                 },
@@ -148,7 +618,7 @@
           "401": {
             "description": "회원가입 실패",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommonResponse"
                 },
@@ -162,6 +632,163 @@
             }
           }
         }
+      }
+    },
+    "/api/diet-log": {
+      "post": {
+        "tags": [
+          "DietLog API"
+        ],
+        "summary": "식단 기록하기",
+        "description": "새로운 식단을 기록합니다.",
+        "operationId": "createDietLog",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "dto"
+                ],
+                "type": "object",
+                "properties": {
+                  "dto": {
+                    "$ref": "#/components/schemas/DietLogRequestDTO"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "식단 기록 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 201,
+                  "code": "201 CREATED",
+                  "message": "식단 기록 성공 - 회원 ID:1,  식단 ID: 8",
+                  "data": {
+                    "id": 8,
+                    "memberId": 1,
+                    "name": "포케",
+                    "imageUrl": "https://s3elixir.s3.ap-northeast-2.amazonaws.com/diet_log/...",
+                    "type": "아침",
+                    "score": 2,
+                    "ingredientTagId": [123],
+                    "time": "2025-05-04T16:32:49.637"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "식단 기록 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "식단 기록 실패: 오류 메시지",
+                  "data": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "DietLog API"
+        ],
+        "summary": "식단 수정하기",
+        "description": "기존에 기록되어 있던 식단을 수정합니다.",
+        "operationId": "updateDietLog",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "dto"
+                ],
+                "type": "object",
+                "properties": {
+                  "dto": {
+                    "$ref": "#/components/schemas/DietLogRequestDTO"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "식단 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "식단 수정 성공 - 회원 ID:1,  식단 ID: 8",
+                  "data": {
+                    "id": 8,
+                    "memberId": 1,
+                    "name": "샐러드",
+                    "imageUrl": "https://s3elixir.s3.ap-northeast-2.amazonaws.com/diet_log/...",
+                    "type": "점심",
+                    "score": 1,
+                    "ingredientTagId": [200],
+                    "time": "2025-05-04T16:33:16.929"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "식단 수정 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "식단 수정 실패: 오류 메시지",
+                  "data": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/auth/refresh": {
@@ -283,6 +910,22 @@
           "required": true
         },
         "responses": {
+          "401": {
+            "description": "로그인 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 UNAUTHORIZED",
+                  "message": "로그인 실패 - 아이디 또는 비밀번호가 일치하지 않습니다.",
+                  "data": null
+                }
+              }
+            }
+          },
           "200": {
             "description": "로그인 성공",
             "content": {
@@ -302,22 +945,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "로그인 실패",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 401,
-                  "code": "401 UNAUTHORIZED",
-                  "message": "로그인 실패 - 아이디 또는 비밀번호가 일치하지 않습니다.",
-                  "data": null
-                }
-              }
-            }
           }
         }
       }
@@ -325,8 +952,10 @@
     "/api/recipe/{recipeId}": {
       "get": {
         "tags": [
-          "recipe-controller"
+          "Recipe API"
         ],
+        "summary": "레시피 상세 조회",
+        "description": "레시피의 상세 정보를 조회합니다.",
         "operationId": "getRecipe",
         "parameters": [
           {
@@ -340,17 +969,362 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
+          "404": {
+            "description": "레시피 없음",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecipeDetailResponseDTO"
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "레시피 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "레시피 상세 조회 성공",
+                  "data": true
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Recipe API"
+        ],
+        "summary": "레시피 삭제",
+        "description": "레시피를 삭제합니다.",
+        "operationId": "deleteRecipe",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "레시피 없음",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "레시피 삭제 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "레시피 삭제 성공",
+                  "data": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Recipe API"
+        ],
+        "summary": "레시피 수정",
+        "description": "레시피를 수정합니다.",
+        "operationId": "updateRecipe",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "dto"
+                ],
+                "type": "object",
+                "properties": {
+                  "dto": {
+                    "$ref": "#/components/schemas/RecipeRequestDTO"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "recipeStepImages": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "레시피 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "레시피 수정 성공",
+                  "data": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "레시피 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/recipe/search": {
+      "get": {
+        "tags": [
+          "Recipe API"
+        ],
+        "summary": "레시피 검색 결과 조회",
+        "description": "레시피의 검색 결과를 조회합니다.",
+        "operationId": "getSearchRecipe",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "categoryType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "한식",
+                "양식",
+                "중식",
+                "일식",
+                "디저트",
+                "음료_차",
+                "양념_소스_잼"
+              ]
+            }
+          },
+          {
+            "name": "categorySlowAging",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "항산화강화",
+                "혈당조절",
+                "염증감소"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "레시피 없음",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "레시피 검색 결과 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "레시피 검색 결과 조회 성공",
+                  "data": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/recipe/search/keyword": {
+      "get": {
+        "tags": [
+          "Recipe API"
+        ],
+        "summary": "인기 검색어 조회",
+        "description": "인기 검색어를 조회합니다.",
+        "operationId": "getSearchKeyword",
+        "responses": {
+          "200": {
+            "description": "인기 검색어 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "인기 검색어 조회 성공",
+                  "data": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/member": {
+      "get": {
+        "tags": [
+          "Member API"
+        ],
+        "summary": "회원 정보 조회",
+        "description": "회원의 기본적인 정보(id, 이메일, 닉네임, 젠더, 생년)를 조회합니다",
+        "operationId": "getMemberInfo",
+        "responses": {
+          "200": {
+            "description": "회원 정보 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "회원 정보 조회 성공",
+                  "data": {
+                    "id": 1,
+                    "email": "example@naver.com",
+                    "nickname": "example",
+                    "gender": "female",
+                    "birthYear": 2002,
+                    "profileUrl": "https://s3elixir.s3..."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "회원 정보 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 INTERNAL_SERVER_ERROR",
+                  "message": "회원 정보 조회 중 오류가 발생했습니다.",
+                  "data": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/member/check-email": {
@@ -389,6 +1363,275 @@
             }
           }
         }
+      }
+    },
+    "/api/ingredient": {
+      "get": {
+        "tags": [
+          "Ingredient API"
+        ],
+        "summary": "모든 식재료 목록 조회",
+        "description": "모든 식재료 목록을 조회합니다.",
+        "operationId": "getAllIngredients",
+        "responses": {
+          "200": {
+            "description": "식재료 목록 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"식재료 목록 조회 성공\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"가시오가피\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"가지\"\n    }, ...\n  ]\n }\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/diet-log/{DietLogId}": {
+      "get": {
+        "tags": [
+          "DietLog API"
+        ],
+        "summary": "식단 기록 정보 조회",
+        "description": "id를 기반으로 하나의 식단 기록 정보를 조회합니다",
+        "operationId": "getDietLog",
+        "parameters": [
+          {
+            "name": "DietLogId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "식단 정보 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "식단 조회 실패: 해당 식단이 존재하지 않습니다. 식단 ID: 2",
+                  "data": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "식단 정보 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "식단 조회 성공 - 회원 ID:1,  식단 ID: 5",
+                  "data": {
+                    "id": 5,
+                    "memberId": 1,
+                    "name": "부대찌개",
+                    "imageUrl": "https://s3elixir.s3.ap-northeast-2.amazonaws.com/diet_log/...",
+                    "type": "저녁",
+                    "score": 3,
+                    "ingredientTagId": [10, 15],
+                    "time": "2025-05-03T08:52:46.034"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "DietLog API"
+        ],
+        "summary": "식단 삭제",
+        "description": "기록된 식단 정보를 삭제합니다.",
+        "operationId": "deleteDietLog",
+        "parameters": [
+          {
+            "name": "DietLogId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "식단 삭제 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "식단 삭제 성공 - 회원 Id: 1, 식단 ID: 1",
+                  "data": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "식단 삭제 실패 - 해당 식단이 존재하지 않습니다. 식단 ID: 1",
+                  "data": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/diet-log/monthly-score/{year}/{month}": {
+      "get": {
+        "tags": [
+          "DietLog API"
+        ],
+        "summary": "월별 식단별 점수 조회",
+        "description": "해당 연, 월의 식단별 점수를 조회합니다",
+        "operationId": "getMonthlyDietScores",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "일별 식단 목록 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "월별 식단별 점수 조회 실패",
+                  "data": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "월별 식단별 점수 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"월별 식단별 점수 조회 성공 - 회원 ID: 1, 연도: 2025, 월: 5\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"time\": \"2025-05-03T08:52:46.034\",\n      \"score\": 3\n    },\n    ...\n  ]\n}\n"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/diet-log/by-date/{date}": {
+      "get": {
+        "tags": [
+          "DietLog API"
+        ],
+        "summary": "일별 식단 목록 조회",
+        "description": "날짜를 기반으로 일별 식단 목록을 조회합니다",
+        "operationId": "getDietLogByDate",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "일별 식단 목록 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"일별 식단 목록 조회 성공 - 회원 ID:1,  날짜: 2025-05-03\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"memberId\": 1,\n      \"name\": \"부대찌개\",\n      \"imageUrl\": \"https://s3elixir.s3.ap-northeast-2.amazonaws.com/diet_log/...\",\n      \"type\": \"저녁\",\n      \"score\": 3,\n      \"ingredientTagId\": [\n        10,\n        15,\n      ],\n      \"time\": \"2025-05-03T08:52:46.034\"\n    },\n    ...\n  ]\n}\n"
+              }
+            }
+          },
+          "400": {
+            "description": "일별 식단 목록 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "일별 식단 목록 조회 실패: 해당 식단이 존재하지 않습니다. 식단 ID: 2",
+                  "data": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/member/withdrawal": {
@@ -443,13 +1686,43 @@
   },
   "components": {
     "schemas": {
+      "RecipeCommentUpdateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "recipeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "CommonResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
       "RecipeRequestDTO": {
         "type": "object",
         "properties": {
-          "memberId": {
-            "type": "integer",
-            "format": "int64"
-          },
           "title": {
             "type": "string"
           },
@@ -492,162 +1765,7 @@
             "type": "integer",
             "format": "int32"
           },
-          "ingredientTagIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          "ingredients": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "seasoning": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "stepDescriptions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "tips": {
-            "type": "string"
-          },
-          "allergy_알류": {
-            "type": "boolean"
-          },
-          "allergy_우유": {
-            "type": "boolean"
-          },
-          "allergy_각류": {
-            "type": "boolean"
-          },
-          "allergy_밀류": {
-            "type": "boolean"
-          },
-          "allergy_유제품": {
-            "type": "boolean"
-          },
-          "allergy_메밀": {
-            "type": "boolean"
-          },
-          "allergy_땅콩": {
-            "type": "boolean"
-          },
-          "allergy_대두": {
-            "type": "boolean"
-          },
-          "allergy_밀": {
-            "type": "boolean"
-          },
-          "allergy_고등어": {
-            "type": "boolean"
-          },
-          "allergy_돼지고기": {
-            "type": "boolean"
-          },
-          "allergy_복숭아": {
-            "type": "boolean"
-          },
-          "allergy_토마토": {
-            "type": "boolean"
-          },
-          "allergy_아황산류": {
-            "type": "boolean"
-          },
-          "allergy_호두": {
-            "type": "boolean"
-          },
-          "allergy_닭고기": {
-            "type": "boolean"
-          },
-          "allergy_쇠고기": {
-            "type": "boolean"
-          },
-          "allergy_오징어": {
-            "type": "boolean"
-          },
-          "allergy_조개류": {
-            "type": "boolean"
-          },
-          "allergy_굴": {
-            "type": "boolean"
-          },
-          "allergy_전복": {
-            "type": "boolean"
-          },
-          "allergy_홍합": {
-            "type": "boolean"
-          },
-          "allergy_잣": {
-            "type": "boolean"
-          }
-        }
-      },
-      "RecipeResponseDTO": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "memberId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "imageUrl": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "categorySlowAging": {
-            "type": "string",
-            "enum": [
-              "항산화강화",
-              "혈당조절",
-              "염증감소"
-            ]
-          },
-          "categoryType": {
-            "type": "string",
-            "enum": [
-              "한식",
-              "양식",
-              "중식",
-              "일식",
-              "디저트",
-              "음료_차",
-              "양념_소스_잼"
-            ]
-          },
-          "difficulty": {
-            "type": "string",
-            "enum": [
-              "쉬움",
-              "보통",
-              "어려움"
-            ]
-          },
-          "timeHours": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "timeMinutes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "ingredientTags": {
+          "ingredientTagNames": {
             "type": "array",
             "items": {
               "type": "string"
@@ -671,115 +1789,26 @@
               "type": "string"
             }
           },
-          "stepImageUrls": {
+          "tips": {
+            "type": "string"
+          },
+          "allergies": {
             "type": "array",
             "items": {
               "type": "string"
             }
-          },
-          "tips": {
-            "type": "string"
-          },
-          "likes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "allergy_알류": {
-            "type": "boolean"
-          },
-          "allergy_우유": {
-            "type": "boolean"
-          },
-          "allergy_각류": {
-            "type": "boolean"
-          },
-          "allergy_밀류": {
-            "type": "boolean"
-          },
-          "allergy_유제품": {
-            "type": "boolean"
-          },
-          "allergy_메밀": {
-            "type": "boolean"
-          },
-          "allergy_땅콩": {
-            "type": "boolean"
-          },
-          "allergy_대두": {
-            "type": "boolean"
-          },
-          "allergy_밀": {
-            "type": "boolean"
-          },
-          "allergy_고등어": {
-            "type": "boolean"
-          },
-          "allergy_돼지고기": {
-            "type": "boolean"
-          },
-          "allergy_복숭아": {
-            "type": "boolean"
-          },
-          "allergy_토마토": {
-            "type": "boolean"
-          },
-          "allergy_아황산류": {
-            "type": "boolean"
-          },
-          "allergy_호두": {
-            "type": "boolean"
-          },
-          "allergy_닭고기": {
-            "type": "boolean"
-          },
-          "allergy_쇠고기": {
-            "type": "boolean"
-          },
-          "allergy_오징어": {
-            "type": "boolean"
-          },
-          "allergy_조개류": {
-            "type": "boolean"
-          },
-          "allergy_굴": {
-            "type": "boolean"
-          },
-          "allergy_전복": {
-            "type": "boolean"
-          },
-          "allergy_홍합": {
-            "type": "boolean"
-          },
-          "allergy_잣": {
-            "type": "boolean"
           }
         }
       },
-      "RecipeCommentDTO": {
+      "RecipeCommentCreateRequestDTO": {
         "type": "object",
         "properties": {
           "recipeId": {
             "type": "integer",
             "format": "int64"
           },
-          "memberId": {
-            "type": "integer",
-            "format": "int64"
-          },
           "content": {
             "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       },
@@ -793,9 +1822,6 @@
             "type": "string"
           },
           "nickname": {
-            "type": "string"
-          },
-          "profileUrl": {
             "type": "string"
           },
           "gender": {
@@ -831,21 +1857,29 @@
           }
         }
       },
-      "CommonResponse": {
+      "DietLogRequestDTO": {
         "type": "object",
         "properties": {
-          "status": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "score": {
             "type": "integer",
             "format": "int32"
           },
-          "code": {
-            "type": "string"
+          "ingredientTagId": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
           },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "type": "object"
+          "time": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -857,184 +1891,6 @@
           },
           "password": {
             "type": "string"
-          }
-        }
-      },
-      "RecipeDetailResponseDTO": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "memberId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "imageUrl": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "categorySlowAging": {
-            "type": "string",
-            "enum": [
-              "항산화강화",
-              "혈당조절",
-              "염증감소"
-            ]
-          },
-          "categoryType": {
-            "type": "string",
-            "enum": [
-              "한식",
-              "양식",
-              "중식",
-              "일식",
-              "디저트",
-              "음료_차",
-              "양념_소스_잼"
-            ]
-          },
-          "difficulty": {
-            "type": "string",
-            "enum": [
-              "쉬움",
-              "보통",
-              "어려움"
-            ]
-          },
-          "timeHours": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "timeMinutes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "ingredientTags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "ingredients": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "seasoning": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "stepDescriptions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "stepImageUrls": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "tips": {
-            "type": "string"
-          },
-          "likes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "allergy_알류": {
-            "type": "boolean"
-          },
-          "allergy_우유": {
-            "type": "boolean"
-          },
-          "allergy_각류": {
-            "type": "boolean"
-          },
-          "allergy_밀류": {
-            "type": "boolean"
-          },
-          "allergy_유제품": {
-            "type": "boolean"
-          },
-          "allergy_메밀": {
-            "type": "boolean"
-          },
-          "allergy_땅콩": {
-            "type": "boolean"
-          },
-          "allergy_대두": {
-            "type": "boolean"
-          },
-          "allergy_밀": {
-            "type": "boolean"
-          },
-          "allergy_고등어": {
-            "type": "boolean"
-          },
-          "allergy_돼지고기": {
-            "type": "boolean"
-          },
-          "allergy_복숭아": {
-            "type": "boolean"
-          },
-          "allergy_토마토": {
-            "type": "boolean"
-          },
-          "allergy_아황산류": {
-            "type": "boolean"
-          },
-          "allergy_호두": {
-            "type": "boolean"
-          },
-          "allergy_닭고기": {
-            "type": "boolean"
-          },
-          "allergy_쇠고기": {
-            "type": "boolean"
-          },
-          "allergy_오징어": {
-            "type": "boolean"
-          },
-          "allergy_조개류": {
-            "type": "boolean"
-          },
-          "allergy_굴": {
-            "type": "boolean"
-          },
-          "allergy_전복": {
-            "type": "boolean"
-          },
-          "allergy_홍합": {
-            "type": "boolean"
-          },
-          "allergy_잣": {
-            "type": "boolean"
-          },
-          "comments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RecipeCommentDTO"
-            }
           }
         }
       }
