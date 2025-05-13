@@ -24,6 +24,10 @@
       "description": "회원 관련 API"
     },
     {
+      "name": "Challenge API",
+      "description": "챌린지 관련 API"
+    },
+    {
       "name": "Auth API",
       "description": "회원 인증 관련 API"
     },
@@ -76,8 +80,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "댓글 수정 성공",
+          "500": {
+            "description": "댓글 수정 실패",
             "content": {
               "*/*": {
                 "schema": {
@@ -86,8 +90,8 @@
               }
             }
           },
-          "500": {
-            "description": "댓글 수정 실패",
+          "200": {
+            "description": "댓글 수정 성공",
             "content": {
               "*/*": {
                 "schema": {
@@ -220,6 +224,16 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "레시피 없음",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "레시피 목록(홈) 조회 성공",
             "content": {
@@ -232,16 +246,6 @@
                   "code": "200 OK",
                   "message": "레시피 목록(홈) 조회 성공",
                   "data": true
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "레시피 없음",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
                 }
               }
             }
@@ -289,6 +293,16 @@
           }
         },
         "responses": {
+          "500": {
+            "description": "레시피 등록 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
           "201": {
             "description": "레시피 등록 성공",
             "content": {
@@ -301,16 +315,6 @@
                   "code": "201 OK",
                   "message": "레시피 등록 성공",
                   "data": true
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "레시피 등록 실패",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
                 }
               }
             }
@@ -343,8 +347,8 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "스크랩 성공",
+          "500": {
+            "description": "스크랩 실패",
             "content": {
               "*/*": {
                 "schema": {
@@ -353,8 +357,8 @@
               }
             }
           },
-          "500": {
-            "description": "스크랩 실패",
+          "201": {
+            "description": "스크랩 성공",
             "content": {
               "*/*": {
                 "schema": {
@@ -483,8 +487,8 @@
           }
         ],
         "responses": {
-          "500": {
-            "description": "좋아요 취소 실패",
+          "200": {
+            "description": "좋아요 취소 성공",
             "content": {
               "*/*": {
                 "schema": {
@@ -493,8 +497,8 @@
               }
             }
           },
-          "200": {
-            "description": "좋아요 취소 성공",
+          "500": {
+            "description": "좋아요 취소 실패",
             "content": {
               "*/*": {
                 "schema": {
@@ -541,6 +545,16 @@
           "required": true
         },
         "responses": {
+          "201": {
+            "description": "댓글 등록 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "댓글 등록 실패",
             "content": {
@@ -550,13 +564,121 @@
                 }
               }
             }
-          },
-          "201": {
-            "description": "댓글 등록 성공",
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/member/{targetMemberId}/follow": {
+      "post": {
+        "tags": [
+          "Member API"
+        ],
+        "summary": "팔로우 하기",
+        "description": "현재 사용자가 다른 사용자를 팔로우합니다.",
+        "operationId": "follow",
+        "parameters": [
+          {
+            "name": "targetMemberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "팔로우 하기 성공",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "팔로우 하기 성공",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "팔로우 하기 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 INTERNAL_SERVER_ERROR",
+                  "message": "팔로우 하기 중 오류가 발생했습니다.",
+                  "data": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Member API"
+        ],
+        "summary": "언팔로우 하기",
+        "description": "현재 사용자가 다른 사용자를 언팔로우합니다.",
+        "operationId": "unfollow",
+        "parameters": [
+          {
+            "name": "targetMemberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "언팔로우 하기 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 INTERNAL_SERVER_ERROR",
+                  "message": "언팔로우 하기 중 오류가 발생했습니다.",
+                  "data": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "언팔로우 하기 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "언팔로우 하기 성공",
+                  "data": null
                 }
               }
             }
@@ -599,22 +721,6 @@
           }
         },
         "responses": {
-          "401": {
-            "description": "회원가입 실패",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 401,
-                  "code": "401 BAD_REQUEST",
-                  "message": "회원가입 실패: 회원가입 중 오류가 발생했습니다.",
-                  "data": null
-                }
-              }
-            }
-          },
           "201": {
             "description": "회원가입 성공",
             "content": {
@@ -626,6 +732,22 @@
                   "status": 200,
                   "code": "200 OK",
                   "message": "회원가입 성공 - memberId: 1",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "회원가입 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 BAD_REQUEST",
+                  "message": "회원가입 실패: 회원가입 중 오류가 발생했습니다.",
                   "data": null
                 }
               }
@@ -664,22 +786,6 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "식단 기록 실패",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 400,
-                  "code": "400 INTERNAL_SERVER_ERROR",
-                  "message": "식단 기록 실패: 오류 메시지",
-                  "data": null
-                }
-              }
-            }
-          },
           "200": {
             "description": "식단 기록 성공",
             "content": {
@@ -701,6 +807,22 @@
                     "ingredientTagId": [123],
                     "time": "2025-05-04T16:32:49.637"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "식단 기록 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "식단 기록 실패: 오류 메시지",
+                  "data": null
                 }
               }
             }
@@ -791,6 +913,74 @@
         ]
       }
     },
+    "/api/challenge": {
+      "post": {
+        "tags": [
+          "Challenge API"
+        ],
+        "summary": "챌린지 등록",
+        "description": "챌린지를 새로 등록합니다.",
+        "operationId": "registerAchievement",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "dto"
+                ],
+                "type": "object",
+                "properties": {
+                  "dto": {
+                    "$ref": "#/components/schemas/ChallengeRequestDTO"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "grayImage": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "챌린지 등록 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 201,
+                  "code": "201 OK",
+                  "message": "챌린지 등록 성공",
+                  "data": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "챌린지 등록 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/auth/refresh": {
       "post": {
         "tags": [
@@ -800,22 +990,6 @@
         "description": "유효한 Refresh Token을 이용해 Access Token을 재발급합니다.",
         "operationId": "refresh",
         "responses": {
-          "401": {
-            "description": "Access Token 재발급 실패",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 401,
-                  "code": "401 UNAUTHORIZED",
-                  "message": "Access Token 재발급 실패 - Access Token 재발급 중 오류가 발생했습니다.",
-                  "data": null
-                }
-              }
-            }
-          },
           "200": {
             "description": "Access Token 재발급 성공",
             "content": {
@@ -830,6 +1004,22 @@
                   "data": {
                     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Token 재발급 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 UNAUTHORIZED",
+                  "message": "Access Token 재발급 실패 - Access Token 재발급 중 오류가 발생했습니다.",
+                  "data": null
                 }
               }
             }
@@ -851,22 +1041,6 @@
         "description": "현재 로그인된 회원을 로그아웃합니다.",
         "operationId": "logout",
         "responses": {
-          "200": {
-            "description": "로그아웃 성공",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 200,
-                  "code": "200 OK",
-                  "message": "로그아웃 성공",
-                  "data": null
-                }
-              }
-            }
-          },
           "401": {
             "description": "로그아웃 실패",
             "content": {
@@ -878,6 +1052,22 @@
                   "status": 401,
                   "code": "401 BAD_REQUEST",
                   "message": "로그아웃 실패 - 유효하지 않거나 만료된 Refresh Token",
+                  "data": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "로그아웃 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "로그아웃 성공",
                   "data": null
                 }
               }
@@ -1327,6 +1517,116 @@
         ]
       }
     },
+    "/api/member/{targetMemberId}/following": {
+      "get": {
+        "tags": [
+          "Member API"
+        ],
+        "summary": "특정 사용자의 팔로잉 목록 조회하기",
+        "description": "특정 사용자가 팔로우하는 회원 목록을 조회합니다.",
+        "operationId": "getFollowingByMemberId",
+        "parameters": [
+          {
+            "name": "targetMemberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "특정 사용자의 팔로잉 목록 조회하기 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 INTERNAL_SERVER_ERROR",
+                  "message": "특정 사용자의 팔로잉 목록 조회하기 중 오류가 발생했습니다.",
+                  "data": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "특정 사용자의 팔로잉 목록 조회하기 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"특정 사용자의 팔로잉 목록 조회하기 성공\",\n  \"data\": [\n      {\n        \"id\": 1,\n        \"nickname\": \"example\",\n        \"profileUrl\": \"https://s3elixir.s3...\",\n        \"title\": \"봄동마스터\"\n      }, ...\n  ]\n}\n"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/member/{targetMemberId}/follower": {
+      "get": {
+        "tags": [
+          "Member API"
+        ],
+        "summary": "특정 사용자의 팔로워 목록 조회하기",
+        "description": "특정 사용자를 팔로우하는 회원 목록을 조회합니다.",
+        "operationId": "getFollowerByMemberId",
+        "parameters": [
+          {
+            "name": "targetMemberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "특정 사용자의 팔로워 목록 조회하기 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 INTERNAL_SERVER_ERROR",
+                  "message": "특정 사용자의 팔로워 목록 조회하기 중 오류가 발생했습니다.",
+                  "data": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "특정 사용자의 팔로워 목록 조회하기 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"특정 사용자의 팔로워 목록 조회하기 성공\",\n  \"data\": [\n      {\n        \"id\": 1,\n        \"nickname\": \"example\",\n        \"profileUrl\": \"https://s3elixir.s3...\",\n        \"title\": \"봄동마스터\"\n      }, ...\n  ]\n}\n"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/member/recipe": {
       "get": {
         "tags": [
@@ -1381,6 +1681,94 @@
                   "code": "200 OK",
                   "message": "내가 스크랩한 레시피 조회 성공",
                   "data": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/member/following": {
+      "get": {
+        "tags": [
+          "Member API"
+        ],
+        "summary": "현재 사용자의 팔로잉 목록 조회하기",
+        "description": "현재 사용자가 팔로우하는 회원 목록을 조회합니다.",
+        "operationId": "getFollowing",
+        "responses": {
+          "200": {
+            "description": "현재 사용자의 팔로잉 목록 조회하기 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"현재 사용자의 팔로잉 목록 조회하기 성공\",\n  \"data\": [\n      {\n        \"id\": 1,\n        \"nickname\": \"example\",\n        \"profileUrl\": \"https://s3elixir.s3...\",\n        \"title\": \"봄동마스터\"\n      }, ...\n  ]\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "현재 사용자의 팔로잉 목록 조회하기 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 INTERNAL_SERVER_ERROR",
+                  "message": "현재 사용자의 팔로잉 목록 조회하기 중 오류가 발생했습니다.",
+                  "data": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/member/follower": {
+      "get": {
+        "tags": [
+          "Member API"
+        ],
+        "summary": "현재 사용자의 팔로워 목록 조회하기",
+        "description": "현재 사용자를 팔로우하는 회원 목록을 조회합니다.",
+        "operationId": "getFollower",
+        "responses": {
+          "200": {
+            "description": "현재 사용자의 팔로워 목록 조회하기 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"현재 사용자의 팔로워 목록 조회하기 성공\",\n  \"data\": [\n      {\n        \"id\": 1,\n        \"nickname\": \"example\",\n        \"profileUrl\": \"https://s3elixir.s3...\",\n        \"title\": \"봄동마스터\"\n      }, ...\n  ]\n}\n"
+              }
+            }
+          },
+          "401": {
+            "description": "현재 사용자의 팔로워 목록 조회하기 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 401,
+                  "code": "401 INTERNAL_SERVER_ERROR",
+                  "message": "현재 사용자의 팔로워 목록 조회하기 중 오류가 발생했습니다.",
+                  "data": null
                 }
               }
             }
@@ -1497,6 +1885,22 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "식단 정보 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "식단 조회 실패: 해당 식단이 존재하지 않습니다. 식단 ID: 2",
+                  "data": null
+                }
+              }
+            }
+          },
           "200": {
             "description": "식단 정보 조회 성공",
             "content": {
@@ -1518,22 +1922,6 @@
                     "ingredientTagId": [10, 15],
                     "time": "2025-05-03T08:52:46.034"
                   }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "식단 정보 조회 실패",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 400,
-                  "code": "400 INTERNAL_SERVER_ERROR",
-                  "message": "식단 조회 실패: 해당 식단이 존재하지 않습니다. 식단 ID: 2",
-                  "data": null
                 }
               }
             }
@@ -1564,22 +1952,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "잘못된 요청",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": {
-                  "status": 400,
-                  "code": "400 INTERNAL_SERVER_ERROR",
-                  "message": "식단 삭제 실패 - 해당 식단이 존재하지 않습니다. 식단 ID: 1",
-                  "data": null
-                }
-              }
-            }
-          },
           "200": {
             "description": "식단 삭제 성공",
             "content": {
@@ -1591,6 +1963,22 @@
                   "status": 200,
                   "code": "200 OK",
                   "message": "식단 삭제 성공 - 회원 Id: 1, 식단 ID: 1",
+                  "data": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "code": "400 INTERNAL_SERVER_ERROR",
+                  "message": "식단 삭제 실패 - 해당 식단이 존재하지 않습니다. 식단 ID: 1",
                   "data": null
                 }
               }
@@ -1633,6 +2021,17 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "월별 식단별 점수 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"월별 식단별 점수 조회 성공 - 회원 ID: 1, 연도: 2025, 월: 5\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"time\": \"2025-05-03T08:52:46.034\",\n      \"score\": 3\n    },\n    ...\n  ]\n}\n"
+              }
+            }
+          },
           "400": {
             "description": "일별 식단 목록 조회 실패",
             "content": {
@@ -1646,17 +2045,6 @@
                   "message": "월별 식단별 점수 조회 실패",
                   "data": null
                 }
-              }
-            }
-          },
-          "200": {
-            "description": "월별 식단별 점수 조회 성공",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"월별 식단별 점수 조회 성공 - 회원 ID: 1, 연도: 2025, 월: 5\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"time\": \"2025-05-03T08:52:46.034\",\n      \"score\": 3\n    },\n    ...\n  ]\n}\n"
               }
             }
           }
@@ -1688,17 +2076,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "일별 식단 목록 조회 성공",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommonResponse"
-                },
-                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"일별 식단 목록 조회 성공 - 회원 ID:1,  날짜: 2025-05-03\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"memberId\": 1,\n      \"name\": \"부대찌개\",\n      \"imageUrl\": \"https://s3elixir.s3.ap-northeast-2.amazonaws.com/diet_log/...\",\n      \"type\": \"저녁\",\n      \"score\": 3,\n      \"ingredientTagId\": [\n        10,\n        15,\n      ],\n      \"time\": \"2025-05-03T08:52:46.034\"\n    },\n    ...\n  ]\n}\n"
-              }
-            }
-          },
           "400": {
             "description": "일별 식단 목록 조회 실패",
             "content": {
@@ -1711,6 +2088,211 @@
                   "code": "400 INTERNAL_SERVER_ERROR",
                   "message": "일별 식단 목록 조회 실패: 해당 식단이 존재하지 않습니다. 식단 ID: 2",
                   "data": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "일별 식단 목록 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": "{\n  \"status\": 200,\n  \"code\": \"200 OK\",\n  \"message\": \"일별 식단 목록 조회 성공 - 회원 ID:1,  날짜: 2025-05-03\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"memberId\": 1,\n      \"name\": \"부대찌개\",\n      \"imageUrl\": \"https://s3elixir.s3.ap-northeast-2.amazonaws.com/diet_log/...\",\n      \"type\": \"저녁\",\n      \"score\": 3,\n      \"ingredientTagId\": [\n        10,\n        15,\n      ],\n      \"time\": \"2025-05-03T08:52:46.034\"\n    },\n    ...\n  ]\n}\n"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/challenge/{challengeId}": {
+      "get": {
+        "tags": [
+          "Challenge API"
+        ],
+        "summary": "특정 챌린지 조회",
+        "description": "특정 챌린지를 조회합니다.",
+        "operationId": "getChallengeDetail",
+        "parameters": [
+          {
+            "name": "challengeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "특정 챌린지 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "특정 챌린지 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "특정 챌린지 조회 성공",
+                  "data": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/challenge/year/{year}": {
+      "get": {
+        "tags": [
+          "Challenge API"
+        ],
+        "summary": "연도 별 챌린지 조회",
+        "description": "연도 별 챌린지를 조회합니다.",
+        "operationId": "getChallengesByYear",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "연도 별 챌린지 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "연도 별 챌린지 조회 성공",
+                  "data": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "연도 별 챌린지 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/challenge/progress": {
+      "get": {
+        "tags": [
+          "Challenge API"
+        ],
+        "summary": "사용자의 현재 진행 상황 조회",
+        "description": "사용자의 현재 진행 상황을 조회합니다.",
+        "operationId": "getProgress",
+        "responses": {
+          "200": {
+            "description": "사용자의 현재 진행 상황 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "사용자의 현재 진행 상황 조회 성공",
+                  "data": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "사용자의 현재 진행 상황 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/challenge/completion": {
+      "get": {
+        "tags": [
+          "Challenge API"
+        ],
+        "summary": "챌린지 최종 완료 여부 조회",
+        "description": "챌린지 최종 완료 여부 조회합니다.",
+        "operationId": "getChallengeCompletion",
+        "responses": {
+          "500": {
+            "description": "챌린지 최종 완료 여부 조회 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "챌린지 최종 완료 여부 조회 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResponse"
+                },
+                "example": {
+                  "status": 200,
+                  "code": "200 OK",
+                  "message": "챌린지 최종 완료 여부 조회 성공",
+                  "data": true
                 }
               }
             }
@@ -1969,6 +2551,79 @@
           "time": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "ChallengeRequestDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "step1Goal1Type": {
+            "type": "string"
+          },
+          "step1Goal2Type": {
+            "type": "string"
+          },
+          "step2Goal1Type": {
+            "type": "string"
+          },
+          "step2Goal2Type": {
+            "type": "string"
+          },
+          "step3Goal1Type": {
+            "type": "string"
+          },
+          "step3Goal2Type": {
+            "type": "string"
+          },
+          "step4Goal1Type": {
+            "type": "string"
+          },
+          "step4Goal2Type": {
+            "type": "string"
+          },
+          "step1Goal1Desc": {
+            "type": "string"
+          },
+          "step1Goal2Desc": {
+            "type": "string"
+          },
+          "step2Goal1Desc": {
+            "type": "string"
+          },
+          "step2Goal2Desc": {
+            "type": "string"
+          },
+          "step3Goal1Desc": {
+            "type": "string"
+          },
+          "step3Goal2Desc": {
+            "type": "string"
+          },
+          "step4Goal1Desc": {
+            "type": "string"
+          },
+          "step4Goal2Desc": {
+            "type": "string"
+          },
+          "achievementName": {
+            "type": "string"
           }
         }
       },
